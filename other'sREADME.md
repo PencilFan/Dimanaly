@@ -1,4 +1,4 @@
-[toc]
+[Toc]
 <p>
   <img src="https://travis-ci.org/connorferster/handcalcs.svg?branch=master">
 <a href='https://coveralls.io/github/connorferster/handcalcs?branch=master'><img src='https://coveralls.io/repos/github/connorferster/handcalcs/badge.svg?branch=master' alt='Coverage Status' /></a>
