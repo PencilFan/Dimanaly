@@ -12,7 +12,7 @@
 5. The_Energy_of_an_Atomic_Bomb_Explosion.ipynb:使用程序估计了第一颗原子弹爆炸释放的能量
 6. docs:功能演示的GIF文件、处理流程的基本单元图片文件、主类Dimformula的工作流程图片文件
 ## 处理流程单元
-![process_flow](docs/process_flow.png)
+<div align="center"><img src="docs/process_flow.png" width=70% /></div>
 ## 主类Dimformula的工作流程
 *详见doc文件夹中的Dimformula_flow.png文件*
 ![Dimformula](docs/DimFormula_flow.png)
