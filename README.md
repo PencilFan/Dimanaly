@@ -5,12 +5,12 @@
 ## 基本功能演示
 ![gif](docs/demonstration.gif)
 ## 文件
-1. Dimanaly.py:主文件
-2. data_base.xlsx:数据库文件
-3. tutorial.ipynb:对程序功能的一些简单介绍
-4. demonstration.ipynb:对程序的一些示范与应用
-5. The_Energy_of_an_Atomic_Bomb_Explosion.ipynb:使用程序估计了第一颗原子弹爆炸释放的能量
-6. docs:含GIF演示文件、处理流程的基本单元图片文件、主类Dimformula的工作流程图片文件
+1. **Dimanaly.py**:主文件
+2. **data_base.xlsx**:数据库文件
+3. **tutorial.ipynb**:对程序功能的一些简单介绍
+4. **demonstration.ipynb**:对程序的一些示范与应用
+5. **The_Energy_of_an_Atomic_Bomb_Explosion.ipynb**:使用程序估计了第一颗原子弹爆炸释放的能量
+6. **docs**:含GIF演示文件、处理流程的基本单元图片文件、主类Dimformula的工作流程图片文件
 ## 处理流程单元
 ![process_flow](docs/process_flow.png)
 ## 主类Dimformula的工作流程
@@ -18,7 +18,7 @@
 ![Dimformula](docs/DimFormula_flow.png)
 ## 说明与改进
 * **关于数据库**
-<br>&emsp;&emsp;为方便获取物理量的量纲信息,此程序使用了一个excel文件,当然用户可以根据自己的需求在原程序的基础上稍加修改后使用csv文件或SQL数据库等.
+<br>&emsp;&emsp;为方便获取物理量的量纲信息,此程序使用了一个excel文件,当然用户可以根据自己的需求在原程序的基础上稍加修改后使用csv文件或SQL数据库等.data_base文件中的数据参考自国际科技数据委员会(CODATA)2014年正式发表的推荐值
 <br>&emsp;&emsp;使用自定义数据库的好处在于用户可以根据自己的需求设置所需物理量的符号、量纲、数值,但坏处是相关数据资源有限,虽然data_base.xlsx文件中也提供了一些数据信息,但并不全面.
 <br>&emsp;&emsp;为弥补这方面的短板,之后会考虑使用scipy.constants.physical_constants的功能以健全数据信息的查找功能.
 * **关于公式正确性的检查**
