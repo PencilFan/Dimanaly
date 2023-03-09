@@ -11,11 +11,6 @@
 4. **demonstration.ipynb**:对程序的一些示范与应用
 5. **The_Energy_of_an_Atomic_Bomb_Explosion.ipynb**:使用程序估计了第一颗原子弹爆炸释放的能量
 6. **docs**:含GIF演示文件、处理流程的基本单元图片文件、主类Dimformula的工作流程图片文件
-## 处理流程单元
-![process_flow](docs/process_flow.png)
-## 主类Dimformula的工作流程
-*详见doc文件夹中的Dimformula_flow.png文件*
-![Dimformula](docs/DimFormula_flow.png)
 ## 说明与改进
 * **关于数据库**
 <br>&emsp;&emsp;为方便获取物理量的量纲信息,此程序使用了一个excel文件,当然用户可以根据自己的需求在原程序的基础上稍加修改后使用csv文件或SQL数据库等.data_base文件中的数据参考自国际科技数据委员会(CODATA)2014年正式发表的推荐值
@@ -91,3 +86,8 @@
 50. sympy.evalf()
 51. re.sample()
 ```
+## 主类Dimformula的工作流程
+*详见doc文件夹中的Dimformula_flow.png文件*
+![Dimformula](docs/DimFormula_flow.png)
+## 处理流程单元
+![process_flow](docs/process_flow.png)
