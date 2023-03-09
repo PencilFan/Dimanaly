@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import sympy as sp
 from random import sample
+from re import Pattern
 
 # 以下是涉及到数据库database的程序,用于从数据库中提取数据
 
@@ -9,7 +10,7 @@ def get_database_columns(path='data_base.xlsx'):
     '''获取数据库的列名信息'''
     df=pd.read_excel(path)
     return df.columns
-def get_varinfo(name,regex=False,path='data_base.xlsx'):
+def get_varinfo(name,regex=False,flags=0,path='data_base.xlsx'):
     '''regex=False,通过完全匹配的方式查找数据库,
     一般用于get_dimmat()函数中自动创建DimVar数据类型'''
     '''regex=True,通过正则表达式的方式查找数据库,并返回找到的第一个结果
@@ -37,10 +38,11 @@ def get_varinfo(name,regex=False,path='data_base.xlsx'):
         df_name=df[col_name]#*得到除去量纲数据外的dataframe
         for col in col_name:
             '''遍历series[col_name]查找'''
+            '''或许可以使用apply方法,但可能没法即时退出循环'''
             series_name=df_name[col]
             series_name=series_name.astype(str)#*转换为字符串类型,便于series.str.contains()的使用,
             #*但不知道为什么用copy=False没法就地更改
-            index_bool=series_name.str.contains(name)#*得到布尔索引
+            index_bool=series_name.str.contains(name,flags=flags,regex=True)#*得到布尔索引
             index_name=series_name[index_bool].index#*根据布尔索引获取目标对象的索引
             if len(index_name)!=0:
                 break#只有找到了数据库中从左往右数第一个匹配的列就返回
@@ -93,13 +95,13 @@ class DimVar:
     '''对于绑定的sympy符号变量属性,默认该变量的属性是正数(positive_autovar=True),
     因为这样便于对表达式进行化简,用户也可以继续添加其他属性'''
     def __init__(self,symbol=None,use_database_byname=None,regex=False,value_of_SI=None,
-                 L=0.,M=0.,T=0.,I=0.,Theta=0.,n=0.,J=0.,positive_autovar=True,**kwrds):
+                 L=0.,M=0.,T=0.,I=0.,Theta=0.,n=0.,J=0.,positive_autovar=True,flags=0,**kwrds):
         self.name=use_database_byname#*用于判断是否使用数据库中的数据
         ## 通过数据库或用户自定义的方式生成量纲变量
         if self.name!=None:
             '''按数据库生成量纲字典'''
             ### 从数据库中提取量纲信息
-            dic_info=get_varinfo(self.name,regex=regex)
+            dic_info=get_varinfo(self.name,flags=flags,regex=regex)
             self.dimdic=dic_info['dimdic']
             ### 判断是否使用数据库中的符号
             if symbol==None:
@@ -139,7 +141,7 @@ class DimVar:
         return self.dimdic
     
 ## 数据提取部分
-def get_dimmat(inputlist,regex=False,positive_autovar=True,**kwrds):##更改,新增',positive_autovar=True,**kwrds'
+def get_dimmat(inputlist,regex=False,positive_autovar=True,flags=0,**kwrds):##更改,新增',positive_autovar=True,**kwrds'
     '''
     输入:由Dimvar数据与字符数据构成的一个单轴列表,
     列表中的字符数据能被自动转换为Dimvar数据,自动转换的过程可以选择是否使用正则表达式
@@ -156,11 +158,12 @@ def get_dimmat(inputlist,regex=False,positive_autovar=True,**kwrds):##更改,新
         '''
         ## 检查输入列表中的变量,将字符数据转换为dimvar数据,
         ## 将所有的dimvar数据添加进dimvarlist列表中
-        if type(input)==DimVar:
+        type_input=type(input)
+        if type_input==DimVar:
             dimvar=input
             dimvarlist.append(dimvar)
-        elif type(input)==str:
-            dimvar=DimVar(use_database_byname=input,regex=regex,positive_autovar=positive_autovar,**kwrds)#*使用的符号应该是数据库中对应的符号
+        elif type_input==str or type_input==Pattern:
+            dimvar=DimVar(use_database_byname=input,regex=regex,positive_autovar=positive_autovar,flags=flags,**kwrds)#*使用的符号应该是数据库中对应的符号
             dimvarlist.append(dimvar)
         else:
             pass#*其他情况则报错
@@ -218,14 +221,15 @@ def get_PiIndex(indegroup,othergroup):
     rowlist=range(ncol)
     population=range(nrow)#*生成随机数产生的范围
     A=indegroup.iloc[rowlist,:]#*初始化方阵
-    A=A.values.astype(float)#*转换数据类型便于数学操作,此处常出错,数据转换失败,不明原因！！
-    ## 构造用于numpy.linalg.solve()求解线性方程组的A、B矩阵
+    A=A.astype('float')#*转换数据类型便于数学操作
+    ## 构造利用numpy.linalg.solve()求解线性方程组的A、B矩阵
     while np.linalg.matrix_rank(A)<ncol:
         '''使用随机数选取满秩矩阵'''
         rowlist=sample(population,ncol)
         A=indegroup.iloc[rowlist,:]
+        A=A.astype('float')#对每次新生成的A也要即使转换数据类型以方便循环条件判断计算矩阵的秩,这里一直被忽略,所以debug了很久
     B=othergroup.iloc[rowlist,:]#*对应A选取的列相应地选取B
-    B=B.astype(float)#与A同理
+    B=B.astype('float')#与A同理
     ## 遍历othergroup的每一列,求解量纲指数、生成字典并添加进列表中
     index_list=[]#*量纲指数列表
     for col in othergroup_columns:
@@ -310,7 +314,7 @@ def subs_symbol_list(symbol_list,dimvarlist,to_value=True):##更改
     return newsymbol_list
 
 class DimFormula:
-    def __init__(self,*inputlist,positive_autovar=True,regex=False,**kwrds):
+    def __init__(self,*inputlist,positive_autovar=True,regex=False,flags=0,**kwrds):
         dimmatlist=[]
         dimvarset=set()#使用集合以过滤重复项,##更改,新增
         inputall_set=set()
@@ -320,7 +324,7 @@ class DimFormula:
         self.othergroup=[]
         for input in inputlist:
             ## 走求解流程然后获得相关数据
-            dimmat,dimvarlist=get_dimmat(input,regex=regex,positive_autovar=positive_autovar,**kwrds)##更改,新增',positive_auovar=True,**kwrds',dimmat,dimvatlist=
+            dimmat,dimvarlist=get_dimmat(input,regex=regex,positive_autovar=positive_autovar,flags=flags,**kwrds)##更改,新增',positive_auovar=True,**kwrds',dimmat,dimvatlist=
             indegroup,othergroup=get_indegroup(dimmat)
             index_list=get_PiIndex(indegroup,othergroup)
             Pilist=get_Pilist(index_list)
